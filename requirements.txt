@@ -1,0 +1,5 @@
+httpx>=0.27
+Pillow>=10
+PicImageSearch>=3.12.11
+pyquery>=2.0
+lxml>=5.4
