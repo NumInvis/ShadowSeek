@@ -161,7 +161,7 @@ async def _collect_sources(ev: Event, settings: Settings) -> list[str]:
     return list(dict.fromkeys(sources))
 
 
-@sv_shadowseek.on_command(("觅影", "图源定位", "找原图"), block=True)
+@sv_shadowseek.on_command(("找鸡", "觅影", "图源定位", "找原图"), block=True)
 async def shadowseek_command(bot: Bot, ev: Event) -> None:
     settings = read_settings()
     if not settings.allowed_in(ev.group_id or None):
@@ -171,8 +171,8 @@ async def shadowseek_command(bot: Bot, ev: Event) -> None:
     if not sources:
         await bot.send(
             format_error(
-                "请发送图片并附带「觅影」，或引用一张图片再发「觅影」。\n"
-                f"发送「{_safe_prefix()}觅影帮助」查看用法。"
+                "图呢？发张图再配一句「觅影」，或者引用图片再发「觅影」。\n"
+                f"发送「{_safe_prefix()}觅影帮助」看看怎么用。"
             )
         )
         return
@@ -180,13 +180,13 @@ async def shadowseek_command(bot: Bot, ev: Event) -> None:
     key = f"{ev.group_id or 'direct'}:{ev.user_id}"
     wait = await _cooldown_wait(key, settings.cooldown_seconds)
     if wait:
-        await bot.send(format_error(f"操作太快，请 {wait} 秒后再试。"))
+        await bot.send(format_error(f"别急，让子弹飞 {wait} 秒。"))
         return
 
     semaphore = await _acquire_slot(settings.max_concurrency)
     try:
         if settings.send_progress:
-            await bot.send("【觅影】正在比对图片与公开来源，请稍候…")
+            await bot.send("【觅影】正在全网翻箱倒柜，顺着图找本尊，稍等…")
         raw = await load_source(
             sources[0], settings.proxy or None, timeout=min(settings.search_timeout, 12)
         )
@@ -203,7 +203,7 @@ async def shadowseek_command(bot: Bot, ev: Event) -> None:
         await bot.send(format_error(str(exc)))
     except Exception as exc:
         logger.exception(f"[ShadowSeek] 觅影失败: {exc}")
-        await bot.send(format_error("检索过程出错，请稍后再试。"))
+        await bot.send(format_error("半路翻车了，稍后再来一趟。"))
     finally:
         semaphore.release()
 
@@ -211,7 +211,7 @@ async def shadowseek_command(bot: Bot, ev: Event) -> None:
 @sv_help.on_fullmatch(("觅影帮助", "图源帮助", "ShadowSeek帮助"), block=True)
 async def shadowseek_help(bot: Bot, ev: Event) -> None:
     prefix = _safe_prefix()
-    text = HELP_TEXT if not prefix else HELP_TEXT.replace("「觅影」", f"「{prefix}觅影」", 1)
+    text = HELP_TEXT if not prefix else HELP_TEXT.replace("「觅影」", f"「{prefix}觅影」")
     await bot.send(text)
     if (ASSETS / "help.png").is_file():
         await bot.send(MessageSegment.image(ASSETS / "help.png"))
