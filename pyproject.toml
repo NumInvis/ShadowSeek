@@ -1,6 +1,6 @@
 [project]
 name = "ShadowSeek"
-version = "0.1.1"
+version = "0.1.2"
 description = "GsCore 以图搜源插件：从图片定位 X 原帖与账号"
 authors = [{ name = "ShadowSeek Contributors" }]
 dependencies = [

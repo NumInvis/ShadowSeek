@@ -24,8 +24,8 @@ from .formatting import HELP_TEXT, format_error, format_result
 
 ASSETS = Path(__file__).resolve().parent.parent / "assets"
 
-sv_shadowseek = SV("觅影", priority=5, area="ALL")
-sv_help = SV("觅影帮助", priority=2)
+sv_shadowseek = SV("找鸡", priority=5, area="ALL")
+sv_help = SV("找鸡帮助", priority=2)
 
 _CQ_IMAGE = re.compile(r"\[CQ:image,([^\]]*)\]")
 _IMAGE_URL = re.compile(r"\.(?:jpg|jpeg|png|webp|gif)(?:[?#].*)?$", re.I)
@@ -171,8 +171,8 @@ async def shadowseek_command(bot: Bot, ev: Event) -> None:
     if not sources:
         await bot.send(
             format_error(
-                "图呢？发张图再配一句「觅影」，或者引用图片再发「觅影」。\n"
-                f"发送「{_safe_prefix()}觅影帮助」看看怎么用。"
+                "请发送图片并带上「找鸡」，或引用图片再发「找鸡」。\n"
+                f"发送「{_safe_prefix()}找鸡帮助」查看用法。"
             )
         )
         return
@@ -180,13 +180,13 @@ async def shadowseek_command(bot: Bot, ev: Event) -> None:
     key = f"{ev.group_id or 'direct'}:{ev.user_id}"
     wait = await _cooldown_wait(key, settings.cooldown_seconds)
     if wait:
-        await bot.send(format_error(f"别急，让子弹飞 {wait} 秒。"))
+        await bot.send(format_error(f"操作太快，请 {wait} 秒后再试。"))
         return
 
     semaphore = await _acquire_slot(settings.max_concurrency)
     try:
         if settings.send_progress:
-            await bot.send("【觅影】正在全网翻箱倒柜，顺着图找本尊，稍等…")
+            await bot.send("【找鸡】正在检索图片来源，请稍候…")
         raw = await load_source(
             sources[0], settings.proxy or None, timeout=min(settings.search_timeout, 12)
         )
@@ -202,16 +202,16 @@ async def shadowseek_command(bot: Bot, ev: Event) -> None:
     except ImageError as exc:
         await bot.send(format_error(str(exc)))
     except Exception as exc:
-        logger.exception(f"[ShadowSeek] 觅影失败: {exc}")
-        await bot.send(format_error("半路翻车了，稍后再来一趟。"))
+        logger.exception(f"[ShadowSeek] 找鸡失败: {exc}")
+        await bot.send(format_error("检索过程出错，请稍后再试。"))
     finally:
         semaphore.release()
 
 
-@sv_help.on_fullmatch(("觅影帮助", "图源帮助", "ShadowSeek帮助"), block=True)
+@sv_help.on_fullmatch(("找鸡帮助",), block=True)
 async def shadowseek_help(bot: Bot, ev: Event) -> None:
     prefix = _safe_prefix()
-    text = HELP_TEXT if not prefix else HELP_TEXT.replace("「觅影」", f"「{prefix}觅影」")
+    text = HELP_TEXT if not prefix else HELP_TEXT.replace("「找鸡」", f"「{prefix}找鸡」")
     await bot.send(text)
     if (ASSETS / "help.png").is_file():
         await bot.send(MessageSegment.image(ASSETS / "help.png"))
@@ -220,8 +220,8 @@ async def shadowseek_help(bot: Bot, ev: Event) -> None:
 if (ASSETS / "ICON.png").is_file():
     register_help(
         "ShadowSeek",
-        f"{_safe_prefix()}觅影帮助",
+        f"{_safe_prefix()}找鸡帮助",
         Image.open(ASSETS / "ICON.png"),
     )
 else:
-    register_help("ShadowSeek", f"{_safe_prefix()}觅影帮助")
+    register_help("ShadowSeek", f"{_safe_prefix()}找鸡帮助")

@@ -1,4 +1,4 @@
-"""ShadowSeek 觅影：发送或引用图片，寻找最可能的 X 原帖与账号。"""
+"""ShadowSeek 找鸡：发送或引用图片，寻找最可能的 X 原帖与账号。"""
 
 from gsuid_core.sv import Plugins
 
